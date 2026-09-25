@@ -352,6 +352,12 @@ function onTouchEnd(e) {
     touchStartX - e.changedTouches[0].clientX
   )
 
+function onTouchMove(e) {
+  if (isMobileRef.current && window.scrollY === 0 && currentRef.current < 2) {
+    e.preventDefault()
+  }
+}
+
   if (Math.abs(delta) < 30 || horizontalDelta > Math.abs(delta)) {
     return
   }
@@ -455,11 +461,18 @@ function onTouchEnd(e) {
       { passive: false }
     )
 
+    window.addEventListener(
+      'touchmove',
+      onTouchMove,
+      { passive: false }
+    )
+
     return () => {
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('touchstart', onTouchStart)
       window.removeEventListener('touchend', onTouchEnd)
+      window.removeEventListener('touchmove', onTouchMove)
     }
   }, [])
 
@@ -563,20 +576,21 @@ function onTouchEnd(e) {
             }}
           />
 
-          <img
-            src="/cars/stack2.png"
-            alt="Car"
-            style={{
-              position: 'absolute',
-              left: '2%',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              width: '42%',
-              height: 'auto',
-              objectFit: 'contain',
-              zIndex: 1,
-            }}
-          />
+<img
+  src="/cars/stack2.png"
+  alt="Car"
+  className="hero-car"
+  style={{
+    position: 'absolute',
+    left: '50%',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '52%',
+    height: 'auto',
+    objectFit: 'contain',
+    zIndex: 3,
+  }}
+/>
 
           <div
             className="hero-copy"
