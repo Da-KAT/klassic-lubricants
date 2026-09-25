@@ -1,26 +1,548 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0a0a0a;
+  --bg-2: #111111;
+
+  --orange: #ff2600;
+  --blue: #1A6BFF;
+  --gold: #C9A84C;
+  --boss-blue: #1A6BFF;
+
+  --text: #f0f0f0;
+  --muted: #888888;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+html {
+  overflow-y: scroll;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /*
+    IMPORTANT:
+
+    Do NOT use scroll-snap-type here.
+
+    The cinematic snap is controlled by
+    page.js so that it can stop completely
+    once Boss → Products begins.
+  */
+
+  scroll-behavior: auto;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+
+  font-family: var(--font-inter), sans-serif;
+
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-bebas), sans-serif;
+}
+
+main {
+  background: var(--bg);
+}
+
+/* ═══════════════════════════════════════
+   CINEMATIC SEQUENCE
+═══════════════════════════════════════ */
+
+.cinematic-scroll {
+  position: relative;
+
+  /*
+    Three full-screen scenes:
+
+      Hero
+      Benzol
+      Boss
+  */
+
+  width: 100%;
+}
+
+.cinematic-snap {
+  position: relative;
+
+  width: 100%;
+  height: 100svh;
+  min-height: 100svh;
+
+  /*
+    Prevent accidental horizontal overflow
+    from the animated panels.
+  */
+  overflow: hidden;
+}
+
+/*
+  Make the cinematic layers feel like one
+  continuous visual canvas.
+*/
+
+.cinematic-snap > * {
+  will-change: transform, opacity;
+}
+
+/* ═══════════════════════════════════════
+   NORMAL PAGE SCROLLING
+═══════════════════════════════════════ */
+
+.normal-scroll {
+  position: relative;
+
+  /*
+    Explicitly ordinary page flow.
+  */
+  scroll-snap-type: none;
+}
+
+/*
+  Product section and everything after it
+  are NOT part of the cinematic system.
+*/
+
+.normal-scroll > * {
+  position: relative;
+}
+
+/* ═══════════════════════════════════════
+   EXISTING CINEMATIC UTILITIES
+═══════════════════════════════════════ */
+
+.cinematic-container {
+  position: relative;
+}
+
+.cinematic-section {
+  position: sticky;
+  top: 0;
+
+  height: 100svh;
+
+  overflow: hidden;
+}
+
+/* Mobile: solid gray filter background */
+.shop-filter-tabs {
+  background: var(--bg);
+}
+
+@media (max-width: 767px) {
+  .shop-filter-tabs {
+    background: var(--bg-2) !important;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(8px); }
+}
+/* ═══════════════════════════════════════
+   MOBILE SAFETY
+═══════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .cinematic-snap {
+    min-height: 100svh;
+    height: 100svh;
+  }
+}
+
+@media (min-width: 768px) {
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    column-gap: 16px !important;
+    row-gap: 16px !important;
+  }
+
+  .product-card {
+    padding: 1.5rem !important;
+    gap: 1rem !important;
+  }
+}
+/*
+  Prevent iOS/Android overscroll from producing
+  strange horizontal movement.
+*/
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.about-section {
+  position: relative;
+  width: 100%;
+  min-height: 720px;
+
+  padding: 5rem clamp(2rem, 5vw, 5rem) 4rem;
+
+  background: var(--bg);
+
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------
+   WAVES
+   --------------------------------------------------------- */
+
+.about-waves {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; /* This forces it to stretch to the bottom */
+  z-index: 0; 
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------
+   CONTENT
+   --------------------------------------------------------- */
+
+.about-inner {
+  position: relative;
+
+  z-index: 2;
+
+  max-width: 1500px;
+  height: 100%;
+
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------------------------------------------------------
+   LABEL
+   --------------------------------------------------------- */
+
+.about-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  margin-bottom: 2.5rem;
+
+  color: var(--orange);
+
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.about-label-line {
+  width: 32px;
+  height: 1px;
+
+  background: var(--orange);
+}
+
+/* ---------------------------------------------------------
+   MAIN CONTENT
+   --------------------------------------------------------- */
+
+.about-main {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.25fr)
+    minmax(280px, 0.75fr);
+
+  gap: clamp(3rem, 7vw, 9rem);
+
+  align-items: center;
+
+  flex: 1;
+}
+
+/* ---------------------------------------------------------
+   HEADING
+   --------------------------------------------------------- */
+
+.about-heading h2 {
+  margin: 0;
+
+  font-family: var(--font-bebas);
+
+  font-size: clamp(4rem, 8vw, 8rem);
+
+  font-weight: 400;
+
+  line-height: 0.84;
+
+  letter-spacing: 0.01em;
+
+  color: var(--text);
+}
+
+.about-heading h2 span {
+  color: var(--orange);
+}
+
+/* ---------------------------------------------------------
+   COPY
+   --------------------------------------------------------- */
+
+.about-copy {
+  max-width: 430px;
+
+  padding-bottom: 0;
+}
+
+.about-intro {
+  margin: 0 0 1rem;
+
+  color: var(--text);
+
+  font-size: clamp(0.9rem, 1.2vw, 1.05rem);
+
+  line-height: 1.65;
+}
+
+.about-description {
+  margin: 0 0 1.5rem;
+
+  color: var(--muted);
+
+  font-size: 0.8rem;
+
+  line-height: 1.75;
+}
+
+/* ---------------------------------------------------------
+   LINK
+   --------------------------------------------------------- */
+
+.about-link {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  color: var(--orange);
+
+  font-size: 10px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.25em;
+
+  text-decoration: none;
+
+  transition:
+    gap 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.about-link span {
+  font-size: 16px;
+
+  line-height: 1;
+}
+
+.about-link:hover {
+  gap: 18px;
+}
+
+/* ---------------------------------------------------------
+   STATS
+   --------------------------------------------------------- */
+
+.about-stats {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  margin-top: 3rem;
+
+  border-top:
+    1px solid rgba(255, 255, 255, 0.08);
+}
+
+.about-stat {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 0.35rem;
+
+  padding:
+    1.25rem
+    2rem
+    0
+    0;
+
+  border-right:
+    1px solid rgba(255, 255, 255, 0.08);
+}
+
+.about-stat:not(:first-child) {
+  padding-left: 2rem;
+}
+
+.about-stat:last-child {
+  border-right: none;
+}
+
+.about-stat-number {
+  font-family: var(--font-bebas);
+
+  font-size: clamp(2.8rem, 4vw, 4rem);
+
+  line-height: 0.9;
+
+  color: var(--text);
+}
+
+.about-stat-label {
+  color: var(--muted);
+
+  font-size: 8px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.2em;
+
+  text-transform: uppercase;
+}
+/* =========================================================
+   TABLET
+   ========================================================= */
+@media (max-width: 900px) {
+  .about-section {
+    position: relative;
+    min-height: 100vh; 
+    overflow: hidden; 
+  }
+
+  .about-main {
+    gap: 3rem;
+  }
+
+  .about-heading h2 {
+    font-size: clamp(3.5rem, 8vw, 6rem);
+  }
+}
+
+/* =========================================================
+   MOBILE (CONSOLIDATED)
+   ========================================================= */
+@media (max-width: 768px) {
+  /* Global Mobile Overrides */
+  .cinematic-snap {
+    min-height: 100svh;
+    height: 100svh;
+  }
+
+  .shop-filter-tabs {
+    background: var(--bg-2) !important;
+  }
+
+  /* About Section General */
+  .about-section {
+    min-height: auto;
+    padding: 5rem 1.5rem 4rem;
+  }
+
+  /* Wave Fix: Forces waves to cover the entire section on mobile */
+  .about-waves {
+    height: 100% !important;
+    top: 0 !important;
+  }
+
+  /* About Content Adjustments */
+  .about-label {
+    margin-bottom: 2.5rem;
+  }
+
+  .about-main {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .about-heading h2 {
+    font-size: clamp(4rem, 16vw, 7rem);
+  }
+
+  .about-copy {
+    max-width: 100%;
+  }
+
+  .about-intro {
+    font-size: 0.95rem;
+  }
+
+  .about-description {
+    font-size: 0.78rem;
+  }
+
+  /* Mobile Stats Layout: Forces a single row of 3 columns */
+.about-stats {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    
+    /* This moves the entire block (including the top border) up or down */
+    margin-top: -10px !important; 
+    
+    /* ADD THIS: This creates space inside the block, pushing the numbers down */
+    padding-top: 1.5rem; 
+    
+    position: relative;
+    z-index: 2;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .about-stat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.25rem 0 0 0;
+    border-right: none; /* Removes borders to prevent a cramped look on small screens */
+  }
+
+  .about-stat:not(:first-child) {
+    padding-left: 0;
+  }
+
+  .about-stat-number {
+    /* Slightly smaller font to ensure all 3 numbers fit horizontally */
+    font-size: clamp(1.8rem, 6vw, 2.5rem); 
+  }
+
+  .about-stat-label {
+    font-size: 0.65rem !important; 
+    letter-spacing: 0.05em;
+  }
+}
+
+/* =========================================================
+   SMALL PHONES
+   ========================================================= */
+@media (max-width: 480px) {
+  .about-section {
+    padding: 4rem 1.25rem 3rem;
+  }
+
+  .about-heading h2 {
+    font-size: 17vw;
+  }
+  
+  /* Grid overrides removed from here so they stay in a flex row! */
 }
