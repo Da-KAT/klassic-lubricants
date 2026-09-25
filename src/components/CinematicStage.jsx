@@ -44,7 +44,7 @@ function SineWave({ color, canvasRef }) {
         H
       )
 
-      mainGradient.addColorStop(0, color + '22')
+      mainGradient.addColorStop(0, color + '48')
       mainGradient.addColorStop(1, 'rgba(0,0,0,0)')
 
       ctx.fillStyle = mainGradient
@@ -65,7 +65,7 @@ function SineWave({ color, canvasRef }) {
         ctx.lineTo(x, y)
       }
 
-      ctx.strokeStyle = color + '45'
+      ctx.strokeStyle = color + '65'
       ctx.lineWidth = 1
       ctx.stroke()
 
@@ -106,7 +106,7 @@ function SineWave({ color, canvasRef }) {
 
       secondaryGradient.addColorStop(
         0,
-        secondaryColor + '16'
+        secondaryColor + '30'
       )
 
       secondaryGradient.addColorStop(
@@ -159,6 +159,7 @@ export default function CinematicStage() {
   // Buffer used when leaving Boss → Products
   const productsScrollBufferRef = useRef(0)
   const releaseProductsRef = useRef(false)
+  const isMobileRef = useRef(false)
 
   useEffect(() => {
     const scenes = [
@@ -171,7 +172,15 @@ export default function CinematicStage() {
      * Keep the cinematic sequence pinned to the top of
      * the document while we're inside it.
      */
+    function isMobile() {
+      return window.matchMedia('(max-width: 767px)').matches
+    }
+
+    isMobileRef.current = isMobile()
+
     function lockScroll() {
+      if (isMobileRef.current) return
+
       if (window.scrollY !== 0) {
         window.scrollTo({
           top: 0,
@@ -219,7 +228,7 @@ export default function CinematicStage() {
         ? 'translateY(50px)'
         : 'translateY(-50px)'
 
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         next.style.opacity = '1'
         next.style.transform = 'translateY(0)'
 
@@ -227,8 +236,8 @@ export default function CinematicStage() {
 
         setTimeout(() => {
           isAnimatingRef.current = false
-        }, 600)
-      }, 50)
+        }, 720)
+      })
     }
 
     function onWheel(e) {
@@ -324,16 +333,71 @@ export default function CinematicStage() {
      * ==================================================
      */
     let touchStartY = 0
+    let touchStartX = 0
 
     function onTouchStart(e) {
+      if (isMobile()) {
+        isMobileRef.current = true
+        e.preventDefault()
+      }
+
       touchStartY = e.touches[0].clientY
+      touchStartX = e.touches[0].clientX
     }
 
     function onTouchEnd(e) {
-      const delta =
-        touchStartY - e.changedTouches[0].clientY
+      const delta = touchStartY - e.changedTouches[0].clientY
+      const horizontalDelta = Math.abs(
+        touchStartX - e.changedTouches[0].clientX
+      )
 
-      if (Math.abs(delta) < 30) {
+      if (Math.abs(delta) < 30 || horizontalDelta > Math.abs(delta)) {
+        return
+      }
+
+      const mobile = isMobileRef.current
+
+      /*
+       * On mobile, touchstart is prevented so the browser never
+       * begins a competing native scroll. The cinematic controller
+       * owns the Hero → Benzol → Boss sequence.
+       */
+      if (mobile) {
+        const current = currentRef.current
+
+        if (current === 2 && delta > 0) {
+          productsScrollBufferRef.current += Math.abs(delta)
+
+          if (productsScrollBufferRef.current >= 140) {
+            productsScrollBufferRef.current = 0
+            releaseProductsRef.current = true
+
+            window.scrollTo({
+              top: window.innerHeight,
+              behavior: 'smooth',
+            })
+          }
+
+          return
+        }
+
+        if (current === 2 && delta < 0) {
+          productsScrollBufferRef.current = 0
+          releaseProductsRef.current = false
+        }
+
+        if (current === 0 && delta < 0) {
+          return
+        }
+
+        if (isAnimatingRef.current) return
+
+        if (delta > 0) {
+          goTo(current + 1)
+        } else {
+          goTo(current - 1)
+        }
+
         return
       }
 
@@ -343,16 +407,10 @@ export default function CinematicStage() {
 
       const current = currentRef.current
 
-      /*
-       * Boss → Products.
-       */
       if (current === 2 && delta > 0) {
         return
       }
 
-      /*
-       * Hero → nothing above.
-       */
       if (current === 0 && delta < 0) {
         e.preventDefault()
         return
@@ -382,7 +440,7 @@ export default function CinematicStage() {
     window.addEventListener(
       'touchstart',
       onTouchStart,
-      { passive: true }
+      { passive: false }
     )
 
     window.addEventListener(
@@ -414,11 +472,52 @@ export default function CinematicStage() {
       ? 'translateY(0)'
       : 'translateY(50px)',
     transition:
-      'opacity 0.6s ease, transform 0.6s ease',
+      'opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1), transform 0.72s cubic-bezier(0.22, 1, 0.36, 1)',
   })
 
   return (
     <>
+      <style>{`
+        @media (max-width: 767px) {
+          #home {
+            touch-action: none;
+          }
+
+          #home .hero-car {
+            left: 50% !important;
+            top: 8% !important;
+            width: 84% !important;
+            transform: translateX(-50%) !important;
+          }
+
+          #home .hero-copy {
+            position: absolute !important;
+            top: 47% !important;
+            left: 0 !important;
+            width: 100% !important;
+            padding: 0 1.25rem !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+          }
+
+          #home .hero-copy h1 {
+            font-size: clamp(3.5rem, 18vw, 5.5rem) !important;
+            text-align: center !important;
+          }
+
+          #home .hero-copy p {
+            max-width: 300px !important;
+            text-align: center !important;
+            margin-top: 0.85rem !important;
+          }
+
+          #home .hero-car,
+          #home .hero-copy {
+            will-change: transform, opacity;
+          }
+        }
+      `}</style>
       <div
         id="home"
         style={{
@@ -452,7 +551,7 @@ export default function CinematicStage() {
               width: '100%',
               height: '180px',
               background:
-                'linear-gradient(to bottom, rgba(26,107,255,0.1), transparent)',
+                'linear-gradient(to bottom, rgba(26,107,255,0.16), transparent)',
               zIndex: 1,
               pointerEvents: 'none',
             }}
@@ -474,6 +573,7 @@ export default function CinematicStage() {
           />
 
           <div
+            className="hero-copy"
             style={{
               position: 'relative',
               zIndex: 2,
