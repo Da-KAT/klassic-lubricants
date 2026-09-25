@@ -335,95 +335,101 @@ export default function CinematicStage() {
     let touchStartY = 0
     let touchStartX = 0
 
-    function onTouchStart(e) {
-      if (isMobile()) {
-        isMobileRef.current = true
-        e.preventDefault()
-      }
+function onTouchStart(e) {
+  isMobileRef.current = isMobile()
 
-      touchStartY = e.touches[0].clientY
-      touchStartX = e.touches[0].clientX
+  if (isMobileRef.current && window.scrollY === 0) {
+    e.preventDefault()
+  }
+
+  touchStartY = e.touches[0].clientY
+  touchStartX = e.touches[0].clientX
+}
+
+function onTouchEnd(e) {
+  const delta = touchStartY - e.changedTouches[0].clientY
+  const horizontalDelta = Math.abs(
+    touchStartX - e.changedTouches[0].clientX
+  )
+
+  if (Math.abs(delta) < 30 || horizontalDelta > Math.abs(delta)) {
+    return
+  }
+
+  const mobile = isMobileRef.current
+
+  /*
+   * On mobile, touchstart is prevented so the browser never
+   * begins a competing native scroll. The cinematic controller
+   * owns the Hero → Benzol → Boss sequence.
+   */
+  if (mobile) {
+    if (window.scrollY > 0) {
+      // Already released into Products — let native scroll take over.
+      return
     }
 
-    function onTouchEnd(e) {
-      const delta = touchStartY - e.changedTouches[0].clientY
-      const horizontalDelta = Math.abs(
-        touchStartX - e.changedTouches[0].clientX
-      )
+    const current = currentRef.current
 
-      if (Math.abs(delta) < 30 || horizontalDelta > Math.abs(delta)) {
-        return
+    if (current === 2 && delta > 0) {
+      productsScrollBufferRef.current += Math.abs(delta)
+
+      if (productsScrollBufferRef.current >= 140) {
+        productsScrollBufferRef.current = 0
+        releaseProductsRef.current = true
+
+        window.scrollTo({
+          top: window.innerHeight,
+          behavior: 'smooth',
+        })
       }
 
-      const mobile = isMobileRef.current
-
-      /*
-       * On mobile, touchstart is prevented so the browser never
-       * begins a competing native scroll. The cinematic controller
-       * owns the Hero → Benzol → Boss sequence.
-       */
-      if (mobile) {
-        const current = currentRef.current
-
-        if (current === 2 && delta > 0) {
-          productsScrollBufferRef.current += Math.abs(delta)
-
-          if (productsScrollBufferRef.current >= 140) {
-            productsScrollBufferRef.current = 0
-            releaseProductsRef.current = true
-
-            window.scrollTo({
-              top: window.innerHeight,
-              behavior: 'smooth',
-            })
-          }
-
-          return
-        }
-
-        if (current === 2 && delta < 0) {
-          productsScrollBufferRef.current = 0
-          releaseProductsRef.current = false
-        }
-
-        if (current === 0 && delta < 0) {
-          return
-        }
-
-        if (isAnimatingRef.current) return
-
-        if (delta > 0) {
-          goTo(current + 1)
-        } else {
-          goTo(current - 1)
-        }
-
-        return
-      }
-
-      if (window.scrollY > 0) {
-        return
-      }
-
-      const current = currentRef.current
-
-      if (current === 2 && delta > 0) {
-        return
-      }
-
-      if (current === 0 && delta < 0) {
-        e.preventDefault()
-        return
-      }
-
-      e.preventDefault()
-
-      if (delta > 0) {
-        goTo(current + 1)
-      } else if (delta < 0) {
-        goTo(current - 1)
-      }
+      return
     }
+
+    if (current === 2 && delta < 0) {
+      productsScrollBufferRef.current = 0
+      releaseProductsRef.current = false
+    }
+
+    if (current === 0 && delta < 0) {
+      return
+    }
+
+    if (isAnimatingRef.current) return
+
+    if (delta > 0) {
+      goTo(current + 1)
+    } else {
+      goTo(current - 1)
+    }
+
+    return
+  }
+
+  if (window.scrollY > 0) {
+    return
+  }
+
+  const current = currentRef.current
+
+  if (current === 2 && delta > 0) {
+    return
+  }
+
+  if (current === 0 && delta < 0) {
+    e.preventDefault()
+    return
+  }
+
+  e.preventDefault()
+
+  if (delta > 0) {
+    goTo(current + 1)
+  } else if (delta < 0) {
+    goTo(current - 1)
+  }
+}
 
     window.addEventListener(
       'wheel',
