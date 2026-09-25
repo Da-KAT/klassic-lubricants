@@ -352,11 +352,6 @@ function onTouchEnd(e) {
     touchStartX - e.changedTouches[0].clientX
   )
 
-function onTouchMove(e) {
-  if (isMobileRef.current && window.scrollY === 0 && currentRef.current < 2) {
-    e.preventDefault()
-  }
-}
 
   if (Math.abs(delta) < 30 || horizontalDelta > Math.abs(delta)) {
     return
@@ -434,6 +429,12 @@ function onTouchMove(e) {
     goTo(current + 1)
   } else if (delta < 0) {
     goTo(current - 1)
+  }
+}
+
+function onTouchMove(e) {
+  if (isMobileRef.current && window.scrollY === 0 && currentRef.current < 2) {
+    e.preventDefault()
   }
 }
 
