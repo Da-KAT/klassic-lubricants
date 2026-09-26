@@ -1,18 +1,21 @@
 'use client'
 
+import Link from 'next/link'
 import { PRODUCTS, BRAND_ACCENT } from '@/app/data/products'
 
 function ProductCard({ product }) {
   const accent = BRAND_ACCENT[product.brand]
 
   return (
-    <div
+    <Link
+      href={`/shop/${product.id}`}
       className="flex flex-col gap-3 p-4 transition-all hover:-translate-y-1"
       style={{
         background: 'var(--bg-2)',
         border: '1px solid rgba(255,255,255,0.06)',
         cursor: 'pointer',
         minWidth: 0,
+        textDecoration: 'none',
       }}
     >
       {/* Product image */}
@@ -94,13 +97,13 @@ function ProductCard({ product }) {
           </span>
         ))}
       </div>
-    </div>
+    </Link>
   )
 }
 
 export default function ProductStrip() {
   // Pull directly from the same PRODUCTS source
-  // used by the Shop page.
+  // used by the Shop page and product detail pages.
   const featuredProducts = PRODUCTS.slice(0, 6)
 
   return (
@@ -123,15 +126,16 @@ export default function ProductStrip() {
           Our Products
         </h2>
 
-        <a
+        <Link
           href="/shop"
           className="text-xs tracking-widest uppercase hover:opacity-70 transition-opacity"
           style={{
             color: 'var(--orange)',
+            textDecoration: 'none',
           }}
         >
           View All →
-        </a>
+        </Link>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
