@@ -338,6 +338,11 @@ export default function CinematicStage() {
 function onTouchStart(e) {
   isMobileRef.current = isMobile()
 
+  // Let the navigation handle its own touches normally.
+  if (e.target.closest('nav')) {
+    return
+  }
+
   if (isMobileRef.current && window.scrollY === 0) {
     e.preventDefault()
   }
@@ -347,6 +352,11 @@ function onTouchStart(e) {
 }
 
 function onTouchEnd(e) {
+  // Never let the cinematic controller process nav touches.
+  if (e.target.closest('nav')) {
+    return
+  }
+
   const delta = touchStartY - e.changedTouches[0].clientY
   const horizontalDelta = Math.abs(
     touchStartX - e.changedTouches[0].clientX
@@ -433,7 +443,16 @@ function onTouchEnd(e) {
 }
 
 function onTouchMove(e) {
-  if (isMobileRef.current && window.scrollY === 0 && currentRef.current < 2) {
+  // Navigation owns its own touch gestures.
+  if (e.target.closest('nav')) {
+    return
+  }
+
+  if (
+    isMobileRef.current &&
+    window.scrollY === 0 &&
+    currentRef.current < 2
+  ) {
     e.preventDefault()
   }
 }
