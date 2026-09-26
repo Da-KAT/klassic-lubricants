@@ -153,7 +153,7 @@ export default function Nav() {
               stiffness: 300,
               damping: 30,
             }}
-            className="fixed top-0 right-0 h-full z-[90] md:hidden flex flex-col justify-center gap-8 px-10"
+           className="mobile-menu fixed top-0 right-0 h-full z-[90] md:hidden flex flex-col justify-center gap-8 px-10"
             style={{
               width: '70%',
               background: 'rgba(10,10,10,0.97)',

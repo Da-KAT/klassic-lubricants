@@ -338,8 +338,8 @@ export default function CinematicStage() {
 function onTouchStart(e) {
   isMobileRef.current = isMobile()
 
-  // Let the navigation handle its own touches normally.
-  if (e.target.closest('nav')) {
+  // Let navigation and mobile menu handle their own touches.
+  if (e.target.closest('nav, .mobile-menu')) {
     return
   }
 
@@ -353,7 +353,7 @@ function onTouchStart(e) {
 
 function onTouchEnd(e) {
   // Never let the cinematic controller process nav touches.
-  if (e.target.closest('nav')) {
+  if (e.target.closest('nav, .mobile-menu')) {
     return
   }
 
@@ -444,7 +444,7 @@ function onTouchEnd(e) {
 
 function onTouchMove(e) {
   // Navigation owns its own touch gestures.
-  if (e.target.closest('nav')) {
+  if (e.target.closest('nav, .mobile-menu')) {
     return
   }
 
