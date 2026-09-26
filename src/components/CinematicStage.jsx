@@ -505,7 +505,7 @@ function onTouchMove(e) {
 
           #home .hero-car {
             left: 50% !important;
-            top: 8% !important;
+            top: 14% !important;
             width: 84% !important;
             transform: translateX(-50%) !important;
           }
@@ -583,7 +583,7 @@ function onTouchMove(e) {
   className="hero-car"
   style={{
     position: 'absolute',
-    left: '50%',
+    left: '2%',
     top: '50%',
     transform: 'translate(-50%, -50%)',
     width: '52%',
