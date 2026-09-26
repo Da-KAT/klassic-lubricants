@@ -3,15 +3,21 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-const links = ['Home', 'Shop', 'About', 'Contact']
+const links = [
+  { name: 'Home', href: '/' },
+  { name: 'Shop', href: '/shop' },
+  { name: 'About', href: '/about' },
+  { name: 'Contact', href: '/#contact' },
+]
 
 export default function Nav() {
   const [open, setOpen] = useState(false)
 
   return (
     <>
+      {/* Navigation */}
       <nav
-        className="fixed top-0 left-0 w-full z-50 px-6 py-4 flex items-center justify-between"
+        className="fixed top-0 left-0 w-full z-[100] px-4 md:px-6 py-4 flex items-center justify-between"
         style={{
           background: 'rgba(10,10,10,0.85)',
           backdropFilter: 'blur(10px)',
@@ -19,25 +25,37 @@ export default function Nav() {
       >
 
         {/* Logo + Brand Name */}
-        <motion.div
-          animate={{
-            x: open ? '50%' : '0%',
-            left: open ? '0' : 'auto',
-          }}
-          transition={{
-            type: 'spring',
-            stiffness: 300,
-            damping: 30,
-          }}
-          className="z-50 flex items-center"
-        >
+        <div className="z-[110] flex items-center">
           <img
             src="/logo (2).png"
             alt="Klassic Lubricants"
-            className="h-10 w-auto object-contain"
+            className="h-8 md:h-10 w-auto object-contain"
           />
 
+          {/* Mobile brand name */}
           <span
+            className="md:hidden"
+            style={{
+              marginLeft: '9px',
+              color: '#f0f0f0',
+              fontFamily: 'Arial Narrow, Helvetica Neue, Arial, sans-serif',
+              fontSize: '11px',
+              fontWeight: 700,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              lineHeight: 1.05,
+              textShadow: '0 1px 8px rgba(0,0,0,0.4)',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <span>KLASSIC</span>
+            <span>LUBRICANTS</span>
+          </span>
+
+          {/* Desktop brand name */}
+          <span
+            className="hidden md:block"
             style={{
               marginLeft: '12px',
               color: '#f0f0f0',
@@ -53,23 +71,18 @@ export default function Nav() {
           >
             KLASSIC LUBRICANTS
           </span>
-        </motion.div>
+        </div>
 
         {/* Desktop links */}
         <ul className="hidden md:flex gap-8">
           {links.map(link => (
-            <li key={link}>
+            <li key={link.name}>
               <a
-                href={
-                  link === 'Home' ? '/' :
-                  link === 'Shop' ? '/shop' :
-                  link === 'About' ? '/about' :
-                  `#${link.toLowerCase()}`
-                }
+                href={link.href}
                 className="text-sm tracking-widest uppercase hover:text-orange-500 transition-colors"
                 style={{ color: 'var(--text)' }}
               >
-                {link}
+                {link.name}
               </a>
             </li>
           ))}
@@ -77,19 +90,24 @@ export default function Nav() {
 
         {/* Hamburger */}
         <button
-          className="md:hidden flex flex-col gap-1.5 z-50"
-          onClick={() => setOpen(!open)}
+          type="button"
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-expanded={open}
+          onClick={() => setOpen(prev => !prev)}
+          className="md:hidden flex flex-col gap-1.5 z-[110] relative p-2"
         >
           <span
             className={`block w-6 h-0.5 bg-white transition-all duration-300 ${
               open ? 'rotate-45 translate-y-2' : ''
             }`}
           />
+
           <span
             className={`block w-6 h-0.5 bg-white transition-all duration-300 ${
               open ? 'opacity-0' : ''
             }`}
           />
+
           <span
             className={`block w-6 h-0.5 bg-white transition-all duration-300 ${
               open ? '-rotate-45 -translate-y-2' : ''
@@ -98,7 +116,7 @@ export default function Nav() {
         </button>
       </nav>
 
-      {/* Overlay backdrop */}
+      {/* Dark backdrop */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -106,13 +124,15 @@ export default function Nav() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setOpen(false)}
-            className="fixed inset-0 z-30 md:hidden"
-            style={{ background: 'rgba(0,0,0,0.4)' }}
+            className="fixed inset-0 z-[80] md:hidden"
+            style={{
+              background: 'rgba(0,0,0,0.4)',
+            }}
           />
         )}
       </AnimatePresence>
 
-      {/* Mobile slide-in menu */}
+      {/* Mobile menu */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -124,7 +144,7 @@ export default function Nav() {
               stiffness: 300,
               damping: 30,
             }}
-            className="fixed top-0 right-0 h-full z-40 md:hidden flex flex-col justify-center gap-8 px-10"
+            className="fixed top-0 right-0 h-full z-[90] md:hidden flex flex-col justify-center gap-8 px-10"
             style={{
               width: '70%',
               background: 'rgba(10,10,10,0.97)',
@@ -132,8 +152,8 @@ export default function Nav() {
           >
             {links.map(link => (
               <a
-                key={link}
-                href={`#${link.toLowerCase()}`}
+                key={link.name}
+                href={link.href}
                 onClick={() => setOpen(false)}
                 className="text-2xl tracking-widest uppercase hover:text-orange-500 transition-colors"
                 style={{
@@ -141,7 +161,7 @@ export default function Nav() {
                   fontFamily: 'var(--font-bebas)',
                 }}
               >
-                {link}
+                {link.name}
               </a>
             ))}
           </motion.div>
