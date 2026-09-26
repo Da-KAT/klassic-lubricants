@@ -4,21 +4,67 @@ import {
   useState,
   useRef,
   useLayoutEffect,
-  useEffect,
   Suspense,
 } from 'react'
-import { createPortal } from 'react-dom'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   PRODUCTS,
   BRAND_ACCENT,
-  CATEGORIES,
-  BRANDS,
 } from '@/app/data/products'
 import Nav from '@/components/Nav'
 
-function SlidingTabs({ items, active, onChange }) {
+
+/* =========================================================
+   OIL STRUCTURE
+
+   Virgin:
+   - Benzol
+
+   Recycled:
+   - Boss
+   - Lex
+   - CCG
+   - High Speed
+   ========================================================= */
+
+const OIL_SOURCES = [
+  'All',
+  'Virgin Oils',
+  'Recycled Oils',
+]
+
+const SOURCE_VALUES = {
+  'Virgin Oils': 'virgin',
+  'Recycled Oils': 'recycled',
+}
+
+const RECYCLED_BRANDS = [
+  'Boss',
+  'Flex',
+  'CTG',
+  'Hi-Speed',
+]
+
+const SHOP_CATEGORIES = [
+  'ATF',
+  'Brake Fluid',
+  'Engine Oil',
+  'Gear Oil',
+  'Grease',
+  'Others',
+]
+
+
+/* =========================================================
+   SLIDING TABS
+   ========================================================= */
+
+function SlidingTabs({
+  items,
+  active,
+  onChange,
+}) {
   const containerRef = useRef(null)
 
   const [inkStyle, setInkStyle] = useState({
@@ -60,8 +106,7 @@ function SlidingTabs({ items, active, onChange }) {
         display: 'flex',
         overflowX: 'auto',
         scrollbarWidth: 'none',
-        borderBottom:
-          '1px solid rgba(255,255,255,0.08)',
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
         width: '100%',
       }}>
       <motion.div
@@ -87,9 +132,7 @@ function SlidingTabs({ items, active, onChange }) {
       {items.map(item => (
         <button
           key={item}
-          data-active={
-            active === item ? 'true' : 'false'
-          }
+          data-active={active === item ? 'true' : 'false'}
           onClick={() => onChange(item)}
           style={{
             position: 'relative',
@@ -100,12 +143,9 @@ function SlidingTabs({ items, active, onChange }) {
             fontSize: '11px',
             letterSpacing: '3px',
             textTransform: 'uppercase',
-            padding: '0.75rem 1.5rem',
+            padding: '0.6rem 1.25rem',
             whiteSpace: 'nowrap',
-            color:
-              active === item
-                ? '#fff'
-                : 'var(--muted)',
+            color: active === item ? '#fff' : 'var(--muted)',
             transition: 'color 0.15s ease',
           }}>
           {item}
@@ -115,108 +155,232 @@ function SlidingTabs({ items, active, onChange }) {
   )
 }
 
-function FilterTabs({
-  activeBrand,
-  setActiveBrand,
-  activeCategory,
-  setActiveCategory,
-  isFixed = false,
-  navHeight = 0,
+
+/* =========================================================
+   DROPDOWN PILL
+
+   NOTE: no fixed minWidth anymore — pills flex to share
+   the row on mobile (via className), and only get a fixed
+   min-width back on md+ screens.
+   ========================================================= */
+
+function FilterPill({
+  value,
+  placeholder,
+  options,
+  onChange,
 }) {
-  const content = (
-    <>
-      <div className="px-6 md:px-20">
-        <SlidingTabs
-          items={BRANDS}
-          active={activeBrand}
-          onChange={setActiveBrand}
-        />
-      </div>
-
-      <div className="px-6 md:px-20">
-        <SlidingTabs
-          items={CATEGORIES}
-          active={activeCategory}
-          onChange={setActiveCategory}
-        />
-      </div>
-    </>
-  )
-
-  const filterStyle = {
-    background: 'var(--bg)',
-    width: '100%',
-    boxSizing: 'border-box',
-    opacity: 1,
-  }
-
-  if (!isFixed) {
-    return (
-      <div style={filterStyle}>
-        {content}
-      </div>
-    )
-  }
-
-  return createPortal(
+  return (
     <div
+      className="min-w-0 flex-1 md:flex-none"
       style={{
-        ...filterStyle,
-        position: 'fixed',
-        top: `${navHeight}px`,
-        left: 0,
-        right: 0,
-        zIndex: 9999,
-
-        borderBottom:
-          '1px solid rgba(255,255,255,0.06)',
-
-        boxShadow:
-          '0 8px 20px rgba(0,0,0,0.12)',
+        position: 'relative',
+        display: 'inline-flex',
       }}>
-      {content}
-    </div>,
-    document.body
+
+      <select
+        className="w-full md:w-auto md:min-w-[145px]"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        style={{
+          appearance: 'none',
+          WebkitAppearance: 'none',
+          background: 'var(--bg-2)',
+          color: value ? 'var(--text)' : 'var(--muted)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: '999px',
+          padding: '0.55rem 2.25rem 0.55rem 1rem',
+          fontSize: '10px',
+          letterSpacing: '1.5px',
+          textTransform: 'uppercase',
+          cursor: 'pointer',
+          outline: 'none',
+        }}
+      >
+        <option value="" disabled hidden>
+          {placeholder}
+        </option>
+
+        <option value="All">
+          All
+        </option>
+
+        {options.map(option => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+
+      {/* Dropdown arrow */}
+
+      <span
+        style={{
+          position: 'absolute',
+          right: '0.85rem',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          pointerEvents: 'none',
+          color: 'var(--muted)',
+          fontSize: '9px',
+        }}>
+        ▼
+      </span>
+
+    </div>
   )
 }
+
+
+/* =========================================================
+   FILTER TABS
+   ========================================================= */
+
+function FilterTabs({
+  activeSource,
+  setActiveSource,
+
+  activeBrand,
+  setActiveBrand,
+
+  activeCategory,
+  setActiveCategory,
+}) {
+  const isVirgin = activeSource === 'Virgin Oils'
+
+  return (
+    <div style={{ background: 'var(--bg)' }}>
+
+      {/* =================================================
+          PRIMARY FILTER
+          VIRGIN / RECYCLED
+          ================================================= */}
+
+      <SlidingTabs
+        items={OIL_SOURCES}
+        active={activeSource}
+        onChange={source => {
+          setActiveSource(source)
+
+          /*
+           * Reset brand when changing source.
+           * Virgin has no brand selector.
+           */
+          setActiveBrand('')
+
+          /*
+           * Keep category when switching sources.
+           * This makes the filter feel less destructive.
+           */
+        }}
+      />
+
+
+      {/* =================================================
+          DROPDOWN FILTERS
+
+          flex-nowrap so the two pills stay side by side
+          on mobile instead of wrapping to their own lines.
+          ================================================= */}
+
+      <div
+        className="flex flex-nowrap items-center gap-2 mt-2 pb-1">
+
+        {/* BRAND — RECYCLED ONLY */}
+
+        {!isVirgin && (
+          <FilterPill
+            value={activeBrand}
+            placeholder="Select Brand"
+            options={RECYCLED_BRANDS}
+            onChange={setActiveBrand}
+          />
+        )}
+
+
+        {/* CATEGORY */}
+
+        <FilterPill
+          value={activeCategory}
+          placeholder="Select Category"
+          options={SHOP_CATEGORIES}
+          onChange={setActiveCategory}
+        />
+
+      </div>
+
+    </div>
+  )
+}
+
+
+/* =========================================================
+   SHOP
+   ========================================================= */
 
 function ShopInner() {
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  const [activeBrand, setActiveBrand] =
-    useState(
-      searchParams.get('brand') || 'All'
-    )
 
-  const [activeCategory, setActiveCategory] =
-    useState(
-      searchParams.get('category') || 'All'
-    )
+  /* =======================================================
+     FILTER STATE
+     ======================================================= */
 
-  const filterRef = useRef(null)
+  const initialSource = searchParams.get('source')
+  const initialBrand = searchParams.get('brand')
+  const initialCategory = searchParams.get('category')
 
-  const [isStuck, setIsStuck] = useState(false)
+  const [activeSource, setActiveSource] = useState(
+    initialSource === 'recycled'
+      ? 'Recycled Oils'
+      : initialSource === 'virgin'
+        ? 'Virgin Oils'
+        : 'All'
+  )
+
+  const [activeBrand, setActiveBrand] = useState(initialBrand || '')
+  const [activeCategory, setActiveCategory] = useState(initialCategory || '')
+
   const [navHeight, setNavHeight] = useState(0)
-  const [filterHeight, setFilterHeight] =
-    useState(0)
+  const [headerHeight, setHeaderHeight] = useState(0)
+
+  const headerRef = useRef(null)
+
+
+  /* =======================================================
+     FILTER PRODUCTS
+     ======================================================= */
 
   const filtered = PRODUCTS.filter(product => {
+    const selectedType = SOURCE_VALUES[activeSource]
+
+    const sourceMatch =
+      activeSource === 'All' || product.type === selectedType
+
     const brandMatch =
+      !activeBrand ||
       activeBrand === 'All' ||
       product.brand === activeBrand
 
     const categoryMatch =
+      !activeCategory ||
       activeCategory === 'All' ||
       product.category === activeCategory
 
-    return brandMatch && categoryMatch
+    return sourceMatch && brandMatch && categoryMatch
   })
 
-  /*
-   * Find the Nav height so the sticky tabs
-   * sit directly underneath it.
-   */
+
+  /* =======================================================
+     NAV HEIGHT
+
+     The fixed header block below needs an explicit `top`
+     equal to the fixed nav's height, or it sits flush
+     against the very top of the viewport (behind the nav)
+     instead of just under it.
+     ======================================================= */
+
   useLayoutEffect(() => {
     const measureNav = () => {
       const nav =
@@ -225,111 +389,57 @@ function ShopInner() {
 
       if (!nav) return
 
-      setNavHeight(
-        nav.getBoundingClientRect().height
-      )
+      setNavHeight(nav.getBoundingClientRect().height)
     }
 
     measureNav()
 
-    window.addEventListener(
-      'resize',
-      measureNav
-    )
+    window.addEventListener('resize', measureNav)
 
     return () => {
-      window.removeEventListener(
-        'resize',
-        measureNav
-      )
+      window.removeEventListener('resize', measureNav)
     }
   }, [])
 
-  /*
-   * Measure the filter bar itself.
-   */
+
+  /* =======================================================
+     HEADER BLOCK HEIGHT
+
+     Since the header (title + filter tabs) is now taken
+     out of normal flow via `position: fixed`, nothing below
+     it knows to leave room for it. We measure its rendered
+     height here and use it to pad the scrollable content,
+     so the grid starts right below the header instead of
+     underneath it.
+
+     Recomputed on navHeight changes (nav height affects
+     nothing here directly, but keeps this effect re-running
+     alongside layout changes) and on activeSource, since
+     toggling the brand pill can, in edge cases, affect
+     wrapping/height on very narrow viewports.
+     ======================================================= */
+
   useLayoutEffect(() => {
-    const measureFilter = () => {
-      if (!filterRef.current) return
+    const measureHeader = () => {
+      const header = headerRef.current
+      if (!header) return
 
-      setFilterHeight(
-        filterRef.current.getBoundingClientRect()
-          .height
-      )
+      setHeaderHeight(header.getBoundingClientRect().height)
     }
 
-    measureFilter()
+    measureHeader()
 
-    const observer =
-      'ResizeObserver' in window
-        ? new ResizeObserver(measureFilter)
-        : null
-
-    if (observer && filterRef.current) {
-      observer.observe(filterRef.current)
-    }
-
-    window.addEventListener(
-      'resize',
-      measureFilter
-    )
+    window.addEventListener('resize', measureHeader)
 
     return () => {
-      observer?.disconnect()
-
-      window.removeEventListener(
-        'resize',
-        measureFilter
-      )
+      window.removeEventListener('resize', measureHeader)
     }
-  }, [])
+  }, [navHeight, activeSource])
 
-  /*
-   * Detect when the tabs have reached the bottom
-   * of the Nav.
-   */
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!filterRef.current) return
 
-      const rect =
-        filterRef.current.getBoundingClientRect()
-
-      /*
-       * Once the top of the filter reaches the
-       * bottom of the Nav, make the fixed copy appear.
-       */
-      const shouldStick =
-        rect.top <= navHeight
-
-      setIsStuck(shouldStick)
-    }
-
-    handleScroll()
-
-    window.addEventListener(
-      'scroll',
-      handleScroll,
-      { passive: true }
-    )
-
-    window.addEventListener(
-      'resize',
-      handleScroll
-    )
-
-    return () => {
-      window.removeEventListener(
-        'scroll',
-        handleScroll
-      )
-
-      window.removeEventListener(
-        'resize',
-        handleScroll
-      )
-    }
-  }, [navHeight])
+  /* =======================================================
+     RENDER
+     ======================================================= */
 
   return (
     <main
@@ -337,126 +447,141 @@ function ShopInner() {
         background: 'var(--bg)',
         minHeight: '100svh',
       }}>
+
       <Nav />
 
-      {/* =================================================
-          PAGE HEADER
-          ================================================= */}
-      <div
-        className="px-6 md:px-20"
-        style={{
-          paddingTop: '96px',
-          paddingBottom: '0.5rem',
-        }}>
-        <h1
-          className="leading-none"
-          style={{
-            fontFamily: 'var(--font-bebas)',
-            fontSize:
-              'clamp(2rem, 4vw, 3.5rem)',
-            color: 'var(--text)',
-          }}>
-          Our Products
-        </h1>
-
-        <p
-          style={{
-            color: 'var(--muted)',
-            fontSize: '0.75rem',
-            marginTop: '0.15rem',
-          }}>
-          {filtered.length} product
-          {filtered.length !== 1
-            ? 's'
-            : ''}{' '}
-          found
-        </p>
-      </div>
 
       {/* =================================================
-          ORIGINAL FILTER BAR
-          
-          This stays exactly where it belongs in the
-          document and scrolls normally.
+          FIXED HEADER BLOCK
+
+          Contains the page title/count AND the filter tabs
+          as one unit, pinned below the nav. Content in the
+          grid below scrolls underneath this — it never
+          moves, it's simply not part of the scroll flow.
           ================================================= */}
+
       <div
-        ref={filterRef}
+        ref={headerRef}
         style={{
-          position: 'relative',
+          position: 'fixed',
+          top: `${navHeight}px`,
+          left: 0,
+          right: 0,
           zIndex: 20,
           background: 'var(--bg)',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
         }}>
-        <FilterTabs
-          activeBrand={activeBrand}
-          setActiveBrand={setActiveBrand}
-          activeCategory={activeCategory}
-          setActiveCategory={setActiveCategory}
-        />
+
+        {/* =============================================
+            HEADER ROW — stacked on every breakpoint.
+            Title kept small (see fontSize below) so this
+            whole block stays short even on desktop.
+            ============================================= */}
+
+        <div
+          className="px-6 md:px-20"
+          style={{
+            paddingTop: '1.1rem',
+            paddingBottom: '0.5rem',
+          }}>
+
+          {/* PAGE HEADER */}
+
+          <div>
+            <h1
+              className="leading-none"
+              style={{
+                fontFamily: 'var(--font-bebas)',
+                fontSize: 'clamp(1.75rem, 3vw, 2.25rem)',
+                color: 'var(--text)',
+              }}>
+              Our Products
+            </h1>
+
+            <p
+              style={{
+                color: 'var(--muted)',
+                fontSize: '0.75rem',
+                marginTop: '0.15rem',
+              }}>
+              {filtered.length} product
+              {filtered.length !== 1 ? 's' : ''} found
+            </p>
+          </div>
+
+
+          {/* FILTER TABS */}
+
+          <div className="mt-2">
+            <FilterTabs
+              activeSource={activeSource}
+              setActiveSource={setActiveSource}
+              activeBrand={activeBrand}
+              setActiveBrand={setActiveBrand}
+              activeCategory={activeCategory}
+              setActiveCategory={setActiveCategory}
+            />
+          </div>
+
+        </div>
+
       </div>
 
-      {/* =================================================
-          FIXED COPY
-
-          Only exists while the original tabs have
-          reached the Nav.
-          ================================================= */}
-      {isStuck && (
-        <FilterTabs
-          activeBrand={activeBrand}
-          setActiveBrand={setActiveBrand}
-          activeCategory={activeCategory}
-          setActiveCategory={setActiveCategory}
-          isFixed
-          navHeight={navHeight}
-        />
-      )}
 
       {/* =================================================
-          PRODUCT GRID
+          SCROLLABLE CONTENT
+
+          paddingTop = navHeight + headerHeight, so the grid
+          starts exactly below the fixed nav + header block
+          instead of being hidden underneath it.
           ================================================= */}
-      {filtered.length > 0 ? (
-        <div
-          className="product-grid px-4 md:px-20 pb-20"
-          style={{
-            display: 'grid',
 
-            // Mobile = exactly 2 columns
-            gridTemplateColumns:
-              'repeat(2, minmax(0, 1fr))',
+      <div style={{ paddingTop: `${navHeight + headerHeight}px` }}>
 
-            // Space between columns
-            columnGap: '12px',
+        {filtered.length > 0 ? (
 
-            // Space between rows
-            rowGap: '12px',
+          <div
+            className="product-grid grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 px-4 md:px-20 pb-20"
+            style={{
+              columnGap: '12px',
+              rowGap: '12px',
+              background: 'var(--bg)',
+              paddingTop: '0.75rem',
+            }}>
 
-            background: 'var(--bg)',
-          }}>
-          {filtered.map(product => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onClick={() =>
-                router.push(
-                  `/shop/${product.id}`
-                )
-              }
-            />
-          ))}
-        </div>
-      ) : (
-        <div
-          className="px-6 md:px-20 py-20"
-          style={{
-            color: 'var(--muted)',
-            fontSize: '0.875rem',
-          }}>
-          No products match this filter.
-        </div>
-      )}
+            {filtered.map(product => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onClick={() => router.push(`/shop/${product.id}`)}
+              />
+            ))}
+
+          </div>
+
+        ) : (
+
+          <div
+            className="px-6 md:px-20 py-20"
+            style={{
+              color: 'var(--muted)',
+              fontSize: '0.875rem',
+            }}>
+            No products match this filter.
+          </div>
+
+        )}
+
+      </div>
+
     </main>
   )
 }
+
+
+/* =========================================================
+   PAGE
+   ========================================================= */
 
 export default function ShopPage() {
   return (
@@ -466,9 +591,16 @@ export default function ShopPage() {
   )
 }
 
-function ProductCard({ product, onClick }) {
-  const accent =
-    BRAND_ACCENT[product.brand]
+
+/* =========================================================
+   PRODUCT CARD
+   ========================================================= */
+
+function ProductCard({
+  product,
+  onClick,
+}) {
+  const accent = BRAND_ACCENT[product.brand]
 
   return (
     <div
@@ -477,39 +609,30 @@ function ProductCard({ product, onClick }) {
       style={{
         background: 'var(--bg-2)',
         padding: '0.8rem',
-
         cursor: 'pointer',
-
         display: 'flex',
         flexDirection: 'column',
         gap: '0.65rem',
-
-        transition:
-          'background 0.2s ease',
-
+        transition: 'background 0.2s ease',
         minWidth: 0,
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.background =
-          'var(--bg-3)'
+        e.currentTarget.style.background = 'var(--bg-3)'
       }}
       onMouseLeave={e => {
-        e.currentTarget.style.background =
-          'var(--bg-2)'
+        e.currentTarget.style.background = 'var(--bg-2)'
       }}>
+
       {/* Product image */}
+
       <div
         style={{
           width: '100%',
           aspectRatio: '1',
-
-          background:
-            accent + '0d',
-
+          background: accent + '0d',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-
           color: 'var(--muted)',
           fontSize: '9px',
           letterSpacing: '2px',
@@ -517,7 +640,9 @@ function ProductCard({ product, onClick }) {
         IMG
       </div>
 
+
       {/* Brand */}
+
       <span
         style={{
           color: accent,
@@ -528,7 +653,9 @@ function ProductCard({ product, onClick }) {
         {product.brand}
       </span>
 
+
       {/* Product name */}
+
       <span
         style={{
           color: 'var(--text)',
@@ -539,32 +666,32 @@ function ProductCard({ product, onClick }) {
         {product.name}
       </span>
 
+
       {/* Sizes */}
+
       <div
         style={{
           display: 'flex',
           gap: '0.3rem',
           flexWrap: 'wrap',
         }}>
+
         {product.sizes.map(size => (
           <span
             key={size}
             style={{
               fontSize: '8px',
               letterSpacing: '0.7px',
-
               color: 'var(--muted)',
-
-              border:
-                '1px solid rgba(255,255,255,0.08)',
-
-              padding:
-                '0.15rem 0.35rem',
+              border: '1px solid rgba(255,255,255,0.08)',
+              padding: '0.15rem 0.35rem',
             }}>
             {size}
           </span>
         ))}
+
       </div>
+
     </div>
   )
 }
