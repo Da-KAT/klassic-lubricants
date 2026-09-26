@@ -505,9 +505,10 @@ function onTouchMove(e) {
 
           #home .hero-car {
             left: 50% !important;
-            top: 14% !important;
+            top: 20% !important;
             width: 84% !important;
             transform: translateX(-50%) !important;
+
           }
 
           #home .hero-copy {
@@ -583,13 +584,13 @@ function onTouchMove(e) {
   className="hero-car"
   style={{
     position: 'absolute',
-    left: '2%',
+    left: '28%',
     top: '50%',
     transform: 'translate(-50%, -50%)',
-    width: '52%',
+    width: '50%',
     height: 'auto',
     objectFit: 'contain',
-    zIndex: 3,
+    zIndex:0,
   }}
 />
 
