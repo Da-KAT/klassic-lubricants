@@ -26,51 +26,60 @@ export default function Nav() {
 
         {/* Logo + Brand Name */}
         <div className="z-[110] flex items-center">
-          <img
-            src="/logo (2).png"
-            alt="Klassic Lubricants"
-            className="h-8 md:h-10 w-auto object-contain"
-          />
 
-          {/* Mobile brand name */}
-          <span
-            className="md:hidden"
-            style={{
-              marginLeft: '9px',
-              color: '#f0f0f0',
-              fontFamily: 'Arial Narrow, Helvetica Neue, Arial, sans-serif',
-              fontSize: '11px',
-              fontWeight: 700,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              lineHeight: 1.05,
-              textShadow: '0 1px 8px rgba(0,0,0,0.4)',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <span>KLASSIC</span>
-            <span>LUBRICANTS</span>
-          </span>
+          {/* Mobile logo + brand */}
+          <div className="md:hidden flex items-center">
+            <img
+              src="/logo (2).png"
+              alt="Klassic Lubricants"
+              className="h-8 w-auto object-contain"
+            />
 
-          {/* Desktop brand name */}
-          <span
-            className="hidden md:block"
-            style={{
-              marginLeft: '12px',
-              color: '#f0f0f0',
-              fontFamily: 'Arial Narrow, Helvetica Neue, Arial, sans-serif',
-              fontSize: '18px',
-              fontWeight: 700,
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              whiteSpace: 'nowrap',
-              lineHeight: 1,
-              textShadow: '0 1px 8px rgba(0,0,0,0.4)',
-            }}
-          >
-            KLASSIC LUBRICANTS
-          </span>
+            <span
+              style={{
+                marginLeft: '9px',
+                color: '#f0f0f0',
+                fontFamily: 'Arial Narrow, Helvetica Neue, Arial, sans-serif',
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                lineHeight: 1.05,
+                textShadow: '0 1px 8px rgba(0,0,0,0.4)',
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+            >
+              <span>KLASSIC</span>
+              <span>LUBRICANTS</span>
+            </span>
+          </div>
+
+          {/* Desktop logo + brand */}
+          <div className="hidden md:flex items-center">
+            <img
+              src="/logo (2).png"
+              alt="Klassic Lubricants"
+              className="h-10 w-auto object-contain"
+            />
+
+            <span
+              style={{
+                marginLeft: '12px',
+                color: '#f0f0f0',
+                fontFamily: 'Arial Narrow, Helvetica Neue, Arial, sans-serif',
+                fontSize: '18px',
+                fontWeight: 700,
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                whiteSpace: 'nowrap',
+                lineHeight: 1,
+                textShadow: '0 1px 8px rgba(0,0,0,0.4)',
+              }}
+            >
+              KLASSIC LUBRICANTS
+            </span>
+          </div>
         </div>
 
         {/* Desktop links */}
