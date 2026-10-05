@@ -1,7 +1,10 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-
+import StickyContact from '@/components/StickyContact'
+// ...
+      {/* put this right before the <style jsx> block */}
+      <StickyContact />
 function AboutWaves() {
   const canvasRef = useRef(null)
 
