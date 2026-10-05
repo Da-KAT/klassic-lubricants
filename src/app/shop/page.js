@@ -625,20 +625,34 @@ function ProductCard({
 
       {/* Product image */}
 
-      <div
-        style={{
-          width: '100%',
-          aspectRatio: '1',
-          background: accent + '0d',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'var(--muted)',
-          fontSize: '9px',
-          letterSpacing: '2px',
-        }}>
-        IMG
-      </div>
+<div
+  style={{
+    width: '100%',
+    aspectRatio: '1',
+    background: accent + '0d',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'var(--muted)',
+    fontSize: '9px',
+    letterSpacing: '2px',
+    overflow: 'hidden',
+  }}>
+  {product.image ? (
+    <img
+      src={product.image}
+      alt={product.name}
+      loading="lazy"
+      style={{
+        width: '100%',
+        height: '100%',
+        objectFit: 'contain',
+      }}
+    />
+  ) : (
+    'IMG'
+  )}
+</div>
 
 
       {/* Brand */}

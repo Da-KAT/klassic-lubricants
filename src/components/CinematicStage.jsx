@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import Link from 'next/link'
 
 function SineWave({ color, canvasRef, mobileCenter = 0.45 }) {
   useEffect(() => {
@@ -1235,29 +1236,18 @@ function onTouchMove(e) {
 
               </p>
 
-              <a
-
-                href="#shop"
-
-                style={{
-
-                  color: '#C9A84C',
-
-                  fontSize: '11px',
-
-                  letterSpacing: '3px',
-
-                  textTransform: 'uppercase',
-
-                  textDecoration: 'none',
-
-                }}
-
-              >
-
-                See Products →
-
-              </a>
+{/* <Link
+  href="/shop"
+  style={{
+    color: '#C9A84C',
+    fontSize: '11px',
+    letterSpacing: '3px',
+    textTransform: 'uppercase',
+    textDecoration: 'none',
+  }}
+>
+  See Products →
+</Link> */}
 
             </div>
 
@@ -1429,29 +1419,18 @@ function onTouchMove(e) {
 
               </p>
 
-              <a
-
-                href="#shop"
-
-                style={{
-
-                  color: '#1A6BFF',
-
-                  fontSize: '11px',
-
-                  letterSpacing: '3px',
-
-                  textTransform: 'uppercase',
-
-                  textDecoration: 'none',
-
-                }}
-
-              >
-
-                See Products →
-
-              </a>
+<Link
+  href="/shop"
+  style={{
+    color: '#1A6BFF',
+    fontSize: '11px',
+    letterSpacing: '3px',
+    textTransform: 'uppercase',
+    textDecoration: 'none',
+  }}
+>
+  See Products →
+</Link>
 
             </div>
 

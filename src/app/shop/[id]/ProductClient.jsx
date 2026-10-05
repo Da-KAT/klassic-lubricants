@@ -56,26 +56,38 @@ export default function ProductClient({ product }) {
         {/* =================================================
             PRODUCT IMAGE
             ================================================= */}
-        <div
-          className="product-image"
-          style={{
-            width: '100%',
-            maxWidth: '480px',
-            aspectRatio: '1 / 1',
-            background: accent + '0d',
-            border: `1px solid ${accent}22`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'var(--muted)',
-            fontSize: '11px',
-            letterSpacing: '3px',
-            overflow: 'hidden',
-            margin: '0 auto',
-          }}
-        >
-          PRODUCT IMAGE
-        </div>
+<div
+  className="product-image"
+  style={{
+    width: '100%',
+    maxWidth: '480px',
+    aspectRatio: '1 / 1',
+    background: accent + '0d',
+    border: `1px solid ${accent}22`,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'var(--muted)',
+    fontSize: '11px',
+    letterSpacing: '3px',
+    overflow: 'hidden',
+    margin: '0 auto',
+  }}
+>
+  {product.image ? (
+    <img
+      src={product.image}
+      alt={product.name}
+      style={{
+        width: '100%',
+        height: '100%',
+        objectFit: 'contain',
+      }}
+    />
+  ) : (
+    'PRODUCT IMAGE'
+  )}
+</div>
 
         {/* =================================================
             PRODUCT INFO

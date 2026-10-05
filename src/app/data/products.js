@@ -32,7 +32,7 @@ type: 'virgin',
 },
 {
 id: 'benz-04',
-image: '/items/benz-04.jpeg',
+image: '/items/benz-04.png',
 brand: 'Benzol',
 name: '4T Engine Oil SAE 10W-40',
 category: 'Engine Oil',

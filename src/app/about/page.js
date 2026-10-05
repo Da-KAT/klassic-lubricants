@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Nav from '@/components/Nav'
+import Footer from '@/components/Footer'
 
 function WavesCanvas({ color1, color2, color3 }) {
   const canvasRef = useRef(null)
@@ -153,6 +154,23 @@ const PILLARS = [
 ]
 
 export default function AboutPage() {
+  const [currentSlide, setCurrentSlide] = useState(0)
+
+  // Actual image paths (e.g. /logo1.png, /logo2.png, /logo3.png in public directory)
+  const logos = [
+    { src: '/ssic.jpg', alt: 'Klassic Logo 1' },
+    { src: '/benz.jfif', alt: 'Klassic Logo 2' },
+    { src: '/boss.jpg', alt: 'Klassic Logo 3' },
+  ]
+
+  // Auto-cycle through the images
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % logos.length)
+    }, 4000)
+    return () => clearInterval(timer)
+  }, [logos.length])
+
   return (
     <main
       style={{
@@ -188,57 +206,121 @@ export default function AboutPage() {
             maxWidth: '1200px',
             margin: '0 auto',
             width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '4rem',
           }}
         >
-          {/* Logo / image placeholder */}
+          {/* Left Side: Image Carousel (~1/3 horizontal space) */}
           <div
-            className="about-logo-placeholder"
+            className="about-hero-left"
             style={{
+              flex: '0 0 33.333%',
+              maxWidth: '33vw',
               width: '100%',
-              aspectRatio: '1 / 1',
-              maxWidth: '420px',
-              border: '1px solid rgba(255,255,255,0.08)',
-              background: 'rgba(255,255,255,0.025)',
-              borderRadius: '2px',
-              marginBottom: '3rem',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'rgba(255,255,255,0.25)',
-              fontSize: '10px',
-              letterSpacing: '2px',
-              textTransform: 'uppercase',
+              flexDirection: 'column',
             }}
           >
-            Klassic Logo
+            <div
+              className="about-logo-frame"
+              style={{
+                position: 'relative',
+                width: '100%',
+                aspectRatio: '1 / 1',
+                border: '1px solid rgba(255,255,255,0.08)',
+                background: 'rgba(255,255,255,0.025)',
+                borderRadius: '4px',
+                marginBottom: '1.5rem',
+                overflow: 'hidden',
+              }}
+            >
+              {logos.map((logo, idx) => (
+                <img
+                  key={idx}
+                  src={logo.src}
+                  alt={logo.alt}
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    padding: '2rem',
+                    opacity: currentSlide === idx ? 1 : 0,
+                    transition: 'opacity 0.6s ease-in-out',
+                  }}
+                />
+              ))}
+            </div>
+
+            {/* Dots / Ellipses */}
+            <div
+              style={{
+                display: 'flex',
+                gap: '0.75rem',
+                width: '100%',
+                justifyContent: 'center',
+              }}
+            >
+              {logos.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setCurrentSlide(idx)}
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background:
+                      currentSlide === idx
+                        ? 'rgba(255,255,255,0.9)'
+                        : 'rgba(255,255,255,0.2)',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
+                    transition: 'background 0.3s ease',
+                  }}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
           </div>
 
-          <h1
-            className="about-hero-title"
-            style={{
-              fontFamily: 'var(--font-bebas)',
-              fontSize: 'clamp(2.8rem, 6.5vw, 7rem)',
-              lineHeight: 1,
-              color: 'var(--text)',
-              marginBottom: '2rem',
-            }}
+          {/* Right Side: Text */}
+          <div
+            className="about-hero-right"
+            style={{ flex: '1' }}
           >
-            Built for the demands of motion
-          </h1>
+            <h1
+              className="about-hero-title"
+              style={{
+                fontFamily: 'var(--font-bebas)',
+                fontSize: 'clamp(2.8rem, 6.5vw, 7rem)',
+                lineHeight: 1,
+                color: 'var(--text)',
+                marginBottom: '2rem',
+                whiteSpace: 'normal',
+                wordBreak: 'break-word',
+              }}
+            >
+              Built for the demands of motion
+            </h1>
 
-          <p
-            style={{
-              maxWidth: '520px',
-              fontSize: '1rem',
-              lineHeight: 1.7,
-              color: 'var(--muted)',
-            }}
-          >
-            For over a decade, Klassic Lubricants has supplied quality
-            lubrication across Ghana — automotive, transport, industrial,
-            mining. Our products keep machines protected and ready for the
-            work ahead.
-          </p>
+            <p
+              style={{
+                maxWidth: '520px',
+                fontSize: '1rem',
+                lineHeight: 1.7,
+                color: 'var(--muted)',
+              }}
+            >
+              For over a decade, Klassic Lubricants has supplied quality
+              lubrication across Ghana — automotive, transport, industrial,
+              mining. Our products keep machines protected and ready for the
+              work ahead.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -565,102 +647,114 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* ── FOOTER ───────────────────────────────────────────── */}
+      <Footer />
+
       {/* ── RESPONSIVE ───────────────────────────────────────── */}
-      <style jsx>{`
-        .about-hero-title {
-          white-space: nowrap;
-        }
+<style jsx>{`
+  .about-hero-title {
+    white-space: normal !important;
+  }
 
-        @media (max-width: 768px) {
-          .about-hero-content {
-            max-width: 100%;
-          }
+  @media (max-width: 768px) {
+    .about-hero-content {
+      max-width: 100%;
+      flex-direction: column !important;
+      align-items: center !important;
+      text-align: center !important;
+      gap: 2rem !important;
+    }
 
-          .about-hero-title {
-            white-space: normal;
-            text-align: left;
-            font-size: clamp(2.8rem, 12vw, 4.5rem);
-            line-height: 0.95;
-            max-width: 100%;
-            margin-top: 0.75rem !important;
-          }
+    .about-hero-left {
+      flex: 1 1 auto !important;
+      max-width: 280px !important;
+      align-items: center !important;
+    }
 
-          .about-logo-placeholder {
-            width: min(100%, 260px) !important;
-            aspect-ratio: 1 / 1 !important;
-            margin-bottom: 3.5rem !important;
-          }
+    .about-hero-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center !important;
+    }
 
-          .about-hero-content > p:last-child {
-            max-width: 100% !important;
-          }
+    .about-hero-title {
+      text-align: center !important;
+      font-size: clamp(2.8rem, 12vw, 4.5rem);
+      line-height: 0.95;
+      max-width: 100%;
+      margin-top: 0.75rem !important;
+    }
 
-          /* Two-column mobile stats.
-             The third stat naturally moves into column one. */
-          .about-stats-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-            padding: 0 !important;
-          }
+    .about-logo-frame {
+      margin-bottom: 1.25rem !important;
+    }
 
-          .about-stat {
-            padding: 2.25rem 1.25rem !important;
-            border-right: 1px solid rgba(255,255,255,0.06) !important;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
-          }
+    .about-hero-right > p {
+      max-width: 100% !important;
+      text-align: center !important;
+    }
 
-          /* Remove the right border from every second item */
-          .about-stat:nth-child(2n) {
-            border-right: none !important;
-          }
+    /* Two-column mobile stats */
+    .about-stats-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      padding: 0 !important;
+    }
 
-          /* Keep the final single item aligned to the first column */
-          .about-stat:last-child {
-            grid-column: 1;
-          }
+    .about-stat {
+      padding: 2.25rem 1.25rem !important;
+      border-right: 1px solid rgba(255,255,255,0.06) !important;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
 
-          .about-story-grid {
-            grid-template-columns: 1fr !important;
-            gap: 3rem !important;
-          }
+    .about-stat:nth-child(2n) {
+      border-right: none !important;
+    }
 
-          .why-klassic-heading {
-            margin-bottom: 3rem !important;
-          }
+    .about-stat:last-child {
+      grid-column: 1;
+    }
 
-          .why-klassic-grid {
-            grid-template-columns: 1fr !important;
-          }
+    .about-story-grid {
+      grid-template-columns: 1fr !important;
+      gap: 3rem !important;
+    }
 
-          .why-klassic-grid > div {
-            min-height: 190px !important;
-          }
-        }
+    .why-klassic-heading {
+      margin-bottom: 3rem !important;
+    }
 
-        @media (max-width: 480px) {
-          .about-hero-title {
-            font-size: clamp(2.7rem, 13vw, 4rem);
-          }
+    .why-klassic-grid {
+      grid-template-columns: 1fr !important;
+    }
 
-          .about-logo-placeholder {
-            width: 220px !important;
-            margin-bottom: 3.25rem !important;
-          }
+    .why-klassic-grid > div {
+      min-height: 190px !important;
+    }
+  }
 
-          .about-stat {
-            padding: 2rem 1rem !important;
-          }
+  @media (max-width: 480px) {
+    .about-hero-title {
+      font-size: clamp(2.7rem, 13vw, 4rem);
+    }
 
-          .about-stat span:last-child {
-            font-size: 9px !important;
-            letter-spacing: 1.5px !important;
-          }
+    .about-hero-left {
+      max-width: 220px !important;
+    }
 
-          .why-klassic-grid > div {
-            padding: 2rem !important;
-          }
-        }
-      `}</style>
+    .about-stat {
+      padding: 2rem 1rem !important;
+    }
+
+    .about-stat span:last-child {
+      font-size: 9px !important;
+      letter-spacing: 1.5px !important;
+    }
+
+    .why-klassic-grid > div {
+      padding: 2rem !important;
+    }
+  }
+`}</style>
     </main>
   )
 }
-
